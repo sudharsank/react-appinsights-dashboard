@@ -9,19 +9,24 @@ import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 
 import * as strings from 'AppInsightsDashboardWebPartStrings';
 import AppInsightsDashboard from './components/AppInsightsDashboard';
-import { IAppInsightsDashboardProps } from './components/IAppInsightsDashboardProps';
+import { IAppInsightsDashboardProps } from './components/AppInsightsDashboard';
 
 export interface IAppInsightsDashboardWebPartProps {
-  description: string;
+  AppId: string;
+  AppKey: string;
 }
 
-export default class AppInsightsDashboardWebPart extends BaseClientSideWebPart <IAppInsightsDashboardWebPartProps> {
+export default class AppInsightsDashboardWebPart extends BaseClientSideWebPart<IAppInsightsDashboardWebPartProps> {
 
   public render(): void {
     const element: React.ReactElement<IAppInsightsDashboardProps> = React.createElement(
       AppInsightsDashboard,
       {
-        description: this.properties.description
+        AppId: this.properties.AppId,
+        AppKey: this.properties.AppKey,
+        DisplayMode: this.displayMode,
+        onConfigure: this._onConfigure,
+        httpClient: this.context.httpClient
       }
     );
 
@@ -36,6 +41,14 @@ export default class AppInsightsDashboardWebPart extends BaseClientSideWebPart <
     return Version.parse('1.0');
   }
 
+  protected get disableReactivePropertyChanges(): boolean {
+    return true;
+  }
+
+  public _onConfigure = () => {
+    this.context.propertyPane.open();
+  }
+
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
     return {
       pages: [
@@ -47,8 +60,19 @@ export default class AppInsightsDashboardWebPart extends BaseClientSideWebPart <
             {
               groupName: strings.BasicGroupName,
               groupFields: [
-                PropertyPaneTextField('description', {
-                  label: strings.DescriptionFieldLabel
+                PropertyPaneTextField('AppId', {
+                  label: strings.AppIdLabel,
+                  multiline: false,
+                  placeholder: strings.AppIdLabel,
+                  resizable: false,
+                  value: this.properties.AppId
+                }),
+                PropertyPaneTextField('AppKey', {
+                  label: strings.AppKeyLabel,
+                  multiline: false,
+                  placeholder: strings.AppKeyLabel,
+                  resizable: false,
+                  value: this.properties.AppKey
                 })
               ]
             }
