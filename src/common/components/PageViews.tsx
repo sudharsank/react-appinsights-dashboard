@@ -1,11 +1,15 @@
 import * as React from 'react';
+import * as strings from 'AppInsightsDashboardWebPartStrings';
+import { ChartControl, ChartType } from '@pnp/spfx-controls-react/lib/ChartControl';
+import { Spinner } from 'office-ui-fabric-react/lib/Spinner';
+import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
+import { PivotItem } from 'office-ui-fabric-react/lib/Pivot';
+import { css } from 'office-ui-fabric-react/lib/Utilities';
 import { AppInsightsProps } from '../../webparts/appInsightsDashboard/components/AppInsightsDashboard';
 import CustomPivot from '../components/CustomPivot';
 import Helper, { IPageViewCountProps } from '../Helper';
 import { TimeInterval, TimeSpan } from '../enumHelper';
-import { ChartControl, ChartType } from '@pnp/spfx-controls-react/lib/ChartControl';
-import { Spinner } from 'office-ui-fabric-react/lib/Spinner';
-import {MessageBar, MessageBarType} from 'office-ui-fabric-react/lib/MessageBar';
+import styles from '../CommonControl.module.scss';
 
 const map: any = require('lodash/map');
 
@@ -20,17 +24,31 @@ const PageViews: React.FunctionComponent<IPageViewsProps> = (props) => {
     const [noData, setNoData] = React.useState<boolean>(false);
     const [timespanMenus, setTimeSpanMenus] = React.useState<any[]>([]);
     const [timeintervalMenus, setTimeIntervalMenus] = React.useState<any[]>([]);
+    const [selTimeSpan, setSelTimeSpan] = React.useState<string>('');
+    const [selTimeInterval, setSelTimeInterval] = React.useState<string>('');
+    const [menuClick, setMenuClick] = React.useState<boolean>(false);
     const [chartData, setChartData] = React.useState<any>(null);
     const [chartOptions, setChartOptions] = React.useState<any>(null);
 
     const _loadMenus = () => {
         let tsMenus: any[] = props.helper.getTimeSpanMenu();
         setTimeSpanMenus(tsMenus);
+        setSelTimeSpan(tsMenus[4].key);
         let tiMenus: any[] = props.helper.getTimeIntervalMenu();
         setTimeIntervalMenus(tiMenus);
+        setSelTimeInterval(tiMenus[3].key);
+    };
+    const handleTimeSpanMenuClick = (item: PivotItem) => {
+        setMenuClick(true);
+        setSelTimeSpan(item.props.itemKey);
+    };
+    const handleTimeIntervalMenuClick = (item: PivotItem) => {
+        setMenuClick(true);
+        setSelTimeInterval(item.props.itemKey);
     };
     const _loadPageViewsCount = async () => {
-        let response: IPageViewCountProps[] = await props.helper.getPageViewCount(TimeSpan["30 days"], TimeInterval["1 Day"]);
+        if (menuClick) setLoading(true);
+        let response: IPageViewCountProps[] = await props.helper.getPageViewCount(TimeSpan[selTimeSpan], TimeInterval[selTimeInterval]);
         if (response.length > 0) {
             const data: Chart.ChartData = {
                 labels: map(response, 'date'),
@@ -52,30 +70,47 @@ const PageViews: React.FunctionComponent<IPageViewsProps> = (props) => {
                     display: false
                 },
                 title: {
-                    display: true,
+                    display: false,
                     text: "Page Views"
+                },
+                responsive: true,
+                animation: {
+                    easing: 'easeInQuad'
                 }
             };
             setChartOptions(options);
             setLoading(false);
+            setMenuClick(false);
         } else {
             setLoading(false);
             setNoData(true);
+            setMenuClick(false);
         }
     };
 
     React.useEffect(() => {
+        if (selTimeSpan && selTimeInterval) {
+            _loadPageViewsCount();
+        }
+    }, [selTimeSpan, selTimeInterval]);
+
+    React.useEffect(() => {
         if (props.helper) {
             _loadMenus();
-            _loadPageViewsCount();
-            // Testing
-            // setLoading(false);
-            // setNoData(true);
         }
     }, [mainProps.AppId, mainProps.AppKey, props.helper]);
 
     return (
         <div>
+            <div style={{ display: 'flex', paddingBottom: '10px' }}>
+                <div className={styles.centerDiv}>{"Page Views"}</div>
+            </div>
+            <div style={{ display: 'flex', padding: '5px' }}>
+                <div className={styles.centerDiv}>
+                    <CustomPivot ShowLabel={true} LabelText={"Show data for last:"} Items={timespanMenus} SelectedKey={selTimeSpan} OnMenuClick={handleTimeSpanMenuClick} />
+                    <CustomPivot ShowLabel={true} LabelText={"Time Interval:"} Items={timeintervalMenus} SelectedKey={selTimeInterval} OnMenuClick={handleTimeIntervalMenuClick} />
+                </div>
+            </div>
             {loading &&
                 <>
                     <Spinner label="Loading data..." labelPosition={"bottom"} />
@@ -83,21 +118,22 @@ const PageViews: React.FunctionComponent<IPageViewsProps> = (props) => {
             }
             {!loading && !noData &&
                 <>
-                    <div style={{ display: 'flex', padding: '5px' }}>
-                        <CustomPivot ShowLabel={true} LabelText={"Show data for last:"} Items={timespanMenus} />
-                        <CustomPivot ShowLabel={true} LabelText={"Time Interval:"} Items={timeintervalMenus} />
-                    </div>
-                    <div>
-                        <ChartControl
-                            type={ChartType.Line}
-                            data={chartData}
-                            options={chartOptions}
-                        />
+                    <div className={css("ms-Grid-row", styles.content)}>
+                        <div className={"ms-Grid-col ms-xxxl6 ms-xxl6 ms-xl6 ms-lg6"}>
+                            {"Data"}
+                        </div>
+                        <div className={"ms-Grid-col ms-xxxl6 ms-xxl6 ms-xl6 ms-lg6"}>
+                            <ChartControl
+                                type={ChartType.Line}
+                                data={chartData}
+                                options={chartOptions}
+                            />
+                        </div>
                     </div>
                 </>
             }
             {!loading && noData &&
-                <MessageBar messageBarType={MessageBarType.error}>{"Sorry no data!!!"}</MessageBar>
+                <MessageBar messageBarType={MessageBarType.error}>{strings.Msg_NoData}</MessageBar>
             }
         </div>
     );

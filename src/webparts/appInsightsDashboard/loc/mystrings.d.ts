@@ -8,6 +8,8 @@ declare interface IAppInsightsDashboardWebPartStrings {
   Config_Desc: string;
   Config_Desc_ReadMode: string;
   Config_ButtonText: string;
+
+  Msg_NoData: string;
 }
 
 declare module 'AppInsightsDashboardWebPartStrings' {

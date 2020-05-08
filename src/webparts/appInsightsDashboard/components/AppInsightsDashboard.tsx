@@ -2,10 +2,8 @@ import * as React from 'react';
 import styles from './AppInsightsDashboard.module.scss';
 import * as strings from 'AppInsightsDashboardWebPartStrings';
 import { Placeholder } from "@pnp/spfx-controls-react/lib/Placeholder";
-import { escape } from '@microsoft/sp-lodash-subset';
-import { WebPartContext } from '@microsoft/sp-webpart-base';
 import { DisplayMode } from '@microsoft/sp-core-library';
-import { HttpClient, IHttpClientOptions, HttpClientResponse } from '@microsoft/sp-http';
+import { HttpClient } from '@microsoft/sp-http';
 import PageViews from '../../../common/components/PageViews';
 import Helper from '../../../common/Helper';
 

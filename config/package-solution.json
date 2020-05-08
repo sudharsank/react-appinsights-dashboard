@@ -1,7 +1,7 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
-    "name": "react-appinsights-dashboard",
+    "name": "React AppInsights Dashboard",
     "id": "6696970c-955e-4d95-82a3-35c0d2a5818c",
     "version": "1.0.0.0",
     "includeClientSideAssets": true,

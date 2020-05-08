@@ -41,7 +41,6 @@ export default class Helper {
                 });
             });
         }
-        console.log(finalRes);
         return finalRes;
     }
 
@@ -50,7 +49,7 @@ export default class Helper {
         Object.keys(TimeSpan).map(key => {
             items.push({
                 text: key,
-                key: TimeSpan[key]
+                key: key
             });
         });
         return items;
@@ -61,7 +60,7 @@ export default class Helper {
         Object.keys(TimeInterval).map(key => {
             items.push({
                 text: key,
-                key: TimeSpan[key]
+                key: key
             });
         });
         return items;
