@@ -39,6 +39,51 @@
     width: auto; 
     margin: 0 auto;
 }
+.title {
+    font-size: 18px;
+    font-weight: bold;
+}
 .content {
     margin-top: 10px !important;
+}
+.fileiconDiv {
+    width: 3%;
+    display: inline-block;
+    padding-right: 5px;
+    i {
+        position: absolute;
+        top: 8px;
+    }    
+}
+.pageLink {
+    text-decoration: none;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    &:hover {
+        font-weight: 600;
+        text-decoration: underline;
+    }
+}
+.chartContainer {
+    height: 350px;
+    width: 100%;
+}
+.chart {
+    height: 358px !important;
+    max-height: 358px !important;
+    canvas {
+        height: 358px !important;
+        max-height: 358px !important;
+    }
+}
+.textWithIcon {
+    display: flex;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.dataList {
+    overflow-y: auto;
+    height: 350px;
+    width: 100%;
 }

@@ -10,6 +10,9 @@ define([], function () {
     Config_Desc_ReadMode: 'Please configure the settings. Edit the page to access the properties pane.',
     Config_ButtonText: 'Configure',
 
-    Msg_NoData: 'Sorry no data!!!'
+    Msg_NoData: 'Sorry no data!!!',
+    Msg_NoUrl: 'Sorry no "Url" captured!!!',
+    Msg_LoadList: 'Loading list, please wait...',
+    Msg_LoadChart: 'Loading chart, please wait...'
   }
 });

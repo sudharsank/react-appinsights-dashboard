@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as strings from 'AppInsightsDashboardWebPartStrings';
+import styles from '../CommonControl.module.scss';
 import { ChartControl, ChartType } from '@pnp/spfx-controls-react/lib/ChartControl';
 import { Spinner } from 'office-ui-fabric-react/lib/Spinner';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
@@ -7,11 +8,15 @@ import { PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import { css } from 'office-ui-fabric-react/lib/Utilities';
 import { AppInsightsProps } from '../../webparts/appInsightsDashboard/components/AppInsightsDashboard';
 import CustomPivot from '../components/CustomPivot';
-import Helper, { IPageViewCountProps } from '../Helper';
-import { TimeInterval, TimeSpan } from '../enumHelper';
-import styles from '../CommonControl.module.scss';
+import DataList from '../components/DataList';
+import Helper, { IPageViewCountProps, IPageViewDetailProps } from '../Helper';
+import { TimeInterval, TimeSpan, Segments } from '../enumHelper';
+import { IListColProps } from '../CommonProps';
+import { IColumn } from 'office-ui-fabric-react/lib/DetailsList';
+import { IconType, Icon } from 'office-ui-fabric-react/lib/Icon';
 
 const map: any = require('lodash/map');
+const orderBy: any = require('lodash/orderBy');
 
 export interface IPageViewsProps {
     helper: Helper;
@@ -20,7 +25,8 @@ export interface IPageViewsProps {
 const PageViews: React.FunctionComponent<IPageViewsProps> = (props) => {
 
     const mainProps = React.useContext(AppInsightsProps);
-    const [loading, setLoading] = React.useState<boolean>(true);
+    const [loadingChart, setLoadingChart] = React.useState<boolean>(true);
+    const [loadingList, setLoadingList] = React.useState<boolean>(true);
     const [noData, setNoData] = React.useState<boolean>(false);
     const [timespanMenus, setTimeSpanMenus] = React.useState<any[]>([]);
     const [timeintervalMenus, setTimeIntervalMenus] = React.useState<any[]>([]);
@@ -29,6 +35,8 @@ const PageViews: React.FunctionComponent<IPageViewsProps> = (props) => {
     const [menuClick, setMenuClick] = React.useState<boolean>(false);
     const [chartData, setChartData] = React.useState<any>(null);
     const [chartOptions, setChartOptions] = React.useState<any>(null);
+    const [listCols, setListCols] = React.useState<IColumn[]>([]);
+    const [items, setItems] = React.useState<any[]>([]);
 
     const _loadMenus = () => {
         let tsMenus: any[] = props.helper.getTimeSpanMenu();
@@ -47,7 +55,7 @@ const PageViews: React.FunctionComponent<IPageViewsProps> = (props) => {
         setSelTimeInterval(item.props.itemKey);
     };
     const _loadPageViewsCount = async () => {
-        if (menuClick) setLoading(true);
+        if (menuClick) setLoadingChart(true);
         let response: IPageViewCountProps[] = await props.helper.getPageViewCount(TimeSpan[selTimeSpan], TimeInterval[selTimeInterval]);
         if (response.length > 0) {
             const data: Chart.ChartData = {
@@ -79,18 +87,67 @@ const PageViews: React.FunctionComponent<IPageViewsProps> = (props) => {
                 }
             };
             setChartOptions(options);
-            setLoading(false);
+            setLoadingChart(false);
             setMenuClick(false);
         } else {
-            setLoading(false);
+            setLoadingChart(false);
+            setNoData(true);
+            setMenuClick(false);
+        }
+    };
+    const _generateColumns = () => {
+        let cols: IColumn[] = [];
+        cols.push({
+            key: 'Url', name: 'Url', fieldName: 'Url', minWidth: 100, maxWidth: 350,
+            onRender: (item: any, index: number, column: IColumn) => {
+                return (
+                    <div className={styles.textWithIcon}>
+                        <div className={styles.fileiconDiv}>
+                            <Icon iconName="FileASPX" ariaLabel={item.Url} iconType={IconType.Default} />
+                        </div>
+                        {item.Url ? (
+                            <a href={item.Url} target="_blank" className={styles.pageLink}>{item.Url}</a>
+                        ) : (
+                                <span>{strings.Msg_NoUrl}</span>
+                            )}
+                    </div>
+                );
+            }
+        });
+        // cols.push({
+        //     key: 'start', name: 'Start Date', fieldName: 'start', minWidth: 100, maxWidth: 150
+        // });
+        // cols.push({
+        //     key: 'end', name: 'End Date', fieldName: 'end', minWidth: 100, maxWidth: 150
+        // });
+        cols.push({
+            key: 'date', name: 'Date Interval', fieldName: 'date', minWidth: 150, maxWidth: 250
+        });
+        cols.push({
+            key: 'count', name: '#PageViews', fieldName: 'count', minWidth: 100, maxWidth: 150
+        });
+        setListCols(cols);
+    };
+    const _loadPageViews = async () => {
+        if (menuClick) setLoadingList(true);
+        let response: IPageViewDetailProps[] = await props.helper.getPageViews(TimeSpan[selTimeSpan], TimeInterval[selTimeInterval], [Segments.PV_URL]);
+        if (response.length > 0) {
+            _generateColumns();
+            setItems(response);
+            setLoadingList(false);
+            setMenuClick(false);
+        } else {
+            setLoadingList(false);
             setNoData(true);
             setMenuClick(false);
         }
     };
 
     React.useEffect(() => {
-        if (selTimeSpan && selTimeInterval) {
+        if (selTimeSpan && selTimeInterval) {            
+            setNoData(false);
             _loadPageViewsCount();
+            _loadPageViews();
         }
     }, [selTimeSpan, selTimeInterval]);
 
@@ -103,7 +160,7 @@ const PageViews: React.FunctionComponent<IPageViewsProps> = (props) => {
     return (
         <div>
             <div style={{ display: 'flex', paddingBottom: '10px' }}>
-                <div className={styles.centerDiv}>{"Page Views"}</div>
+                <div className={css(styles.centerDiv, styles.title)}>{"Page Views"}</div>
             </div>
             <div style={{ display: 'flex', padding: '5px' }}>
                 <div className={styles.centerDiv}>
@@ -111,28 +168,32 @@ const PageViews: React.FunctionComponent<IPageViewsProps> = (props) => {
                     <CustomPivot ShowLabel={true} LabelText={"Time Interval:"} Items={timeintervalMenus} SelectedKey={selTimeInterval} OnMenuClick={handleTimeIntervalMenuClick} />
                 </div>
             </div>
-            {loading &&
-                <>
-                    <Spinner label="Loading data..." labelPosition={"bottom"} />
-                </>
-            }
-            {!loading && !noData &&
+            {!noData &&
                 <>
                     <div className={css("ms-Grid-row", styles.content)}>
                         <div className={"ms-Grid-col ms-xxxl6 ms-xxl6 ms-xl6 ms-lg6"}>
-                            {"Data"}
+                            {(!loadingList && !noData) ? (
+                                <DataList Items={items} Columns={listCols} GroupBy={true} GroupByCol={"date"} CountCol={"count"} />
+                            ) : (
+                                    <Spinner label={strings.Msg_LoadList} labelPosition={"bottom"} />
+                                )}
                         </div>
-                        <div className={"ms-Grid-col ms-xxxl6 ms-xxl6 ms-xl6 ms-lg6"}>
-                            <ChartControl
-                                type={ChartType.Line}
-                                data={chartData}
-                                options={chartOptions}
-                            />
+                        <div className={css("ms-Grid-col ms-xxxl6 ms-xxl6 ms-xl6 ms-lg6", styles.chartContainer)}>
+                            {(!loadingChart && !noData) ? (
+                                <ChartControl
+                                    type={ChartType.Line}
+                                    data={chartData}
+                                    options={chartOptions}
+                                    className={styles.chart}
+                                />
+                            ) : (
+                                    <Spinner label={strings.Msg_LoadChart} labelPosition={"bottom"} />
+                                )}
                         </div>
                     </div>
                 </>
             }
-            {!loading && noData &&
+            {!loadingChart && !loadingList && noData &&
                 <MessageBar messageBarType={MessageBarType.error}>{strings.Msg_NoData}</MessageBar>
             }
         </div>

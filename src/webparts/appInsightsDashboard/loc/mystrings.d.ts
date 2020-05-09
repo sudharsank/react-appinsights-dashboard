@@ -10,6 +10,9 @@ declare interface IAppInsightsDashboardWebPartStrings {
   Config_ButtonText: string;
 
   Msg_NoData: string;
+  Msg_NoUrl: string;
+  Msg_LoadList: string;
+  Msg_LoadChart: string;
 }
 
 declare module 'AppInsightsDashboardWebPartStrings' {

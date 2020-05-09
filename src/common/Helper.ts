@@ -1,11 +1,20 @@
 import { HttpClient, IHttpClientOptions, HttpClientResponse } from '@microsoft/sp-http';
-import { TimeInterval, TimeSpan } from './enumHelper';
+import { TimeInterval, TimeSpan, Segments } from './enumHelper';
 import * as moment from 'moment';
 
 export interface IPageViewCountProps {
     oriDate: string;
     date: string;
     sum: number;
+}
+export interface IPageViewDetailProps {
+    oriStartDate: string;
+    oriEndDate: string;
+    start: string;
+    end: string;
+    date: string;
+    Url: string;
+    count: string;
 }
 
 export default class Helper {
@@ -39,6 +48,32 @@ export default class Helper {
                     date: moment(seg.start).format("MMM DD, hh:mm A"),
                     sum: seg['pageViews/count'].sum
                 });
+            });
+        }
+        return finalRes;
+    }
+
+    public getPageViews = async (timespan: TimeSpan, timeinterval: TimeInterval, segment: Segments[]): Promise<IPageViewDetailProps[]> => {
+        let finalRes: IPageViewDetailProps[] = [];
+        let finalPostUrl: string = this._postUrl + `/metrics/pageViews/count?timespan=${timespan}&interval=${timeinterval}&segment=${encodeURIComponent(segment.join(','))}`;
+        let response: HttpClientResponse = await this.httpClient.get(finalPostUrl, HttpClient.configurations.v1, this.httpClientOptions);
+        let responseJson: any = await response.json();
+        if (responseJson.value && responseJson.value.segments.length > 0) {
+            let mainSegments: any[] = responseJson.value.segments;
+            mainSegments.map(mainseg => {
+                if (mainseg.segments.length > 0) {
+                    mainseg.segments.map((seg: any) => {
+                        finalRes.push({
+                            oriStartDate: mainseg.start,
+                            oriEndDate: mainseg.end,
+                            start: moment(mainseg.start).format("MM/DD/YYYY"),
+                            end: moment(mainseg.end).format("MM/DD/YYYY"),
+                            date: `${moment(mainseg.start).format("MM/DD/YYYY")} - ${moment(mainseg.end).format("MM/DD/YYYY")}`,
+                            Url: seg[segment[0]],
+                            count: seg['pageViews/count'].sum
+                        });
+                    });
+                }
             });
         }
         return finalRes;
