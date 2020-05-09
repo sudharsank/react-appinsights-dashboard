@@ -5,6 +5,7 @@ import { Placeholder } from "@pnp/spfx-controls-react/lib/Placeholder";
 import { DisplayMode } from '@microsoft/sp-core-library';
 import { HttpClient } from '@microsoft/sp-http';
 import PageViews from '../../../common/components/PageViews';
+import UserStatistics from '../../../common/components/UserStatistics';
 import Helper from '../../../common/Helper';
 
 export interface IAppInsightsDashboardProps {
@@ -41,6 +42,9 @@ const AppInsightsDashboard: React.FunctionComponent<IAppInsightsDashboardProps> 
 							<>
 								<div className={styles.row}>
 									<PageViews helper={helper} />
+								</div>
+								<div className={styles.row}>
+									<UserStatistics helper={helper} />
 								</div>
 							</>
 						)}

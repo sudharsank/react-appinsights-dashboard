@@ -1,19 +1,20 @@
 import * as React from 'react';
 import * as strings from 'AppInsightsDashboardWebPartStrings';
 import styles from '../CommonControl.module.scss';
+import { IconType, Icon } from 'office-ui-fabric-react/lib/Icon';
 import { ChartControl, ChartType } from '@pnp/spfx-controls-react/lib/ChartControl';
 import { Spinner } from 'office-ui-fabric-react/lib/Spinner';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
 import { PivotItem } from 'office-ui-fabric-react/lib/Pivot';
+import { IColumn } from 'office-ui-fabric-react/lib/DetailsList';
 import { css } from 'office-ui-fabric-react/lib/Utilities';
 import { AppInsightsProps } from '../../webparts/appInsightsDashboard/components/AppInsightsDashboard';
+import SectionTitle from '../components/SectionTitle';
 import CustomPivot from '../components/CustomPivot';
 import DataList from '../components/DataList';
-import Helper, { IPageViewCountProps, IPageViewDetailProps } from '../Helper';
+import Helper from '../Helper';
 import { TimeInterval, TimeSpan, Segments } from '../enumHelper';
-import { IListColProps } from '../CommonProps';
-import { IColumn } from 'office-ui-fabric-react/lib/DetailsList';
-import { IconType, Icon } from 'office-ui-fabric-react/lib/Icon';
+import { IPageViewDetailProps, IPageViewCountProps } from '../CommonProps';
 
 const map: any = require('lodash/map');
 const orderBy: any = require('lodash/orderBy');
@@ -114,15 +115,15 @@ const PageViews: React.FunctionComponent<IPageViewsProps> = (props) => {
                 );
             }
         });
-        // cols.push({
-        //     key: 'start', name: 'Start Date', fieldName: 'start', minWidth: 100, maxWidth: 150
-        // });
-        // cols.push({
-        //     key: 'end', name: 'End Date', fieldName: 'end', minWidth: 100, maxWidth: 150
-        // });
         cols.push({
-            key: 'date', name: 'Date Interval', fieldName: 'date', minWidth: 150, maxWidth: 250
+            key: 'start', name: 'Start Date', fieldName: 'start', minWidth: 100, maxWidth: 150
         });
+        cols.push({
+            key: 'end', name: 'End Date', fieldName: 'end', minWidth: 100, maxWidth: 150
+        });
+        // cols.push({
+        //     key: 'date', name: 'Date Interval', fieldName: 'date', minWidth: 150, maxWidth: 250
+        // });
         cols.push({
             key: 'count', name: '#PageViews', fieldName: 'count', minWidth: 100, maxWidth: 150
         });
@@ -159,13 +160,11 @@ const PageViews: React.FunctionComponent<IPageViewsProps> = (props) => {
 
     return (
         <div>
-            <div style={{ display: 'flex', paddingBottom: '10px' }}>
-                <div className={css(styles.centerDiv, styles.title)}>{"Page Views"}</div>
-            </div>
+            <SectionTitle Title={strings.SecTitle_PageViews} />
             <div style={{ display: 'flex', padding: '5px' }}>
                 <div className={styles.centerDiv}>
-                    <CustomPivot ShowLabel={true} LabelText={"Show data for last:"} Items={timespanMenus} SelectedKey={selTimeSpan} OnMenuClick={handleTimeSpanMenuClick} />
-                    <CustomPivot ShowLabel={true} LabelText={"Time Interval:"} Items={timeintervalMenus} SelectedKey={selTimeInterval} OnMenuClick={handleTimeIntervalMenuClick} />
+                    <CustomPivot ShowLabel={true} LabelText={strings.Menu_TimeSpan} Items={timespanMenus} SelectedKey={selTimeSpan} OnMenuClick={handleTimeSpanMenuClick} />
+                    <CustomPivot ShowLabel={true} LabelText={strings.Menu_TimeSpan} Items={timeintervalMenus} SelectedKey={selTimeInterval} OnMenuClick={handleTimeIntervalMenuClick} />
                 </div>
             </div>
             {!noData &&

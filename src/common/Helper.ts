@@ -1,21 +1,8 @@
 import { HttpClient, IHttpClientOptions, HttpClientResponse } from '@microsoft/sp-http';
 import { TimeInterval, TimeSpan, Segments } from './enumHelper';
-import * as moment from 'moment';
+import { IPageViewCountProps, IPageViewDetailProps, defaultDateFormat, chartDateFormat } from './CommonProps';
 
-export interface IPageViewCountProps {
-    oriDate: string;
-    date: string;
-    sum: number;
-}
-export interface IPageViewDetailProps {
-    oriStartDate: string;
-    oriEndDate: string;
-    start: string;
-    end: string;
-    date: string;
-    Url: string;
-    count: string;
-}
+const moment: any = require('moment');
 
 export default class Helper {
     private _appid: string = '';
@@ -45,7 +32,7 @@ export default class Helper {
             segments.map((seg: any) => {
                 finalRes.push({
                     oriDate: seg.start,
-                    date: moment(seg.start).format("MMM DD, hh:mm A"),
+                    date: this.getLocalTime(seg.start),
                     sum: seg['pageViews/count'].sum
                 });
             });
@@ -66,9 +53,9 @@ export default class Helper {
                         finalRes.push({
                             oriStartDate: mainseg.start,
                             oriEndDate: mainseg.end,
-                            start: moment(mainseg.start).format("MM/DD/YYYY"),
-                            end: moment(mainseg.end).format("MM/DD/YYYY"),
-                            date: `${moment(mainseg.start).format("MM/DD/YYYY")} - ${moment(mainseg.end).format("MM/DD/YYYY")}`,
+                            start: this.getFormattedDate(mainseg.start),
+                            end: this.getFormattedDate(mainseg.end),
+                            date: `${this.getFormattedDate(mainseg.start)} - ${this.getFormattedDate(mainseg.end)}`,
                             Url: seg[segment[0]],
                             count: seg['pageViews/count'].sum
                         });
@@ -77,6 +64,22 @@ export default class Helper {
             });
         }
         return finalRes;
+    }
+
+    public getResponseByQuery = async (query: string, timespan?: TimeSpan): Promise<any[]> => {
+        let finalRes: any[] = [];
+        let urlQuery: string = timespan ? `timespan=${timespan}&query=${encodeURIComponent(query)}` : `query=${encodeURIComponent(query)}`;
+        let finalPostUrl: string = this._postUrl + `/query?${urlQuery}`;
+        let responseJson: any = await this.getAPIResponse(finalPostUrl);
+        if (responseJson.tables.length > 0) {
+            finalRes = responseJson.tables[0].rows;
+        }
+        return finalRes;
+    }
+
+    public getAPIResponse = async (urlWithQuery: string): Promise<any> => {
+        let response: HttpClientResponse = await this.httpClient.get(urlWithQuery, HttpClient.configurations.v1, this.httpClientOptions);
+        return await response.json();
     }
 
     public getTimeSpanMenu = (): any[] => {
@@ -99,5 +102,13 @@ export default class Helper {
             });
         });
         return items;
+    }
+
+    public getLocalTime = (utcTime: string): string => {
+        return moment(utcTime).local().format(chartDateFormat);
+    }
+
+    public getFormattedDate = (datetime: string, format?: string): string => {
+        return moment(datetime).local().format(format ? format : defaultDateFormat);
     }
 }

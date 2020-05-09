@@ -24,7 +24,7 @@ const DataList: React.FunctionComponent<IDataListProps> = (props) => {
 
     const _getItemIndex = (key): number => {
         return findIndex(props.Items, (o) => { return o.date == key; });
-    }
+    };
     const _buildGroups = () => {
         let grouped: any[] = groupBy(props.Items, props.GroupByCol);
         let groupsTemp: IGroup[] = [];

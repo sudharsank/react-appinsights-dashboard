@@ -9,6 +9,12 @@ declare interface IAppInsightsDashboardWebPartStrings {
   Config_Desc_ReadMode: string;
   Config_ButtonText: string;
 
+  Menu_TimeSpan: string;
+  Menu_TimeInterval: string;
+
+  SecTitle_PageViews: string;
+  SecTitle_UserStats: string;
+
   Msg_NoData: string;
   Msg_NoUrl: string;
   Msg_LoadList: string;
