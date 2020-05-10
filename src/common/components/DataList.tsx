@@ -1,11 +1,8 @@
 import * as React from 'react';
-import * as strings from 'AppInsightsDashboardWebPartStrings';
 import styles from '../CommonControl.module.scss';
-import { DetailsList, IColumn, DetailsListLayoutMode, ConstrainMode, SelectionMode, IGroup, CollapseAllVisibility } from 'office-ui-fabric-react/lib/DetailsList';
-import { IListColProps } from '../CommonProps';
+import { DetailsList, IColumn, DetailsListLayoutMode, ConstrainMode, SelectionMode, IGroup } from 'office-ui-fabric-react/lib/DetailsList';
 
 const groupBy: any = require('lodash/groupBy');
-const sumBy: any = require('lodash/sumBy');
 const findIndex: any = require('lodash/findIndex');
 
 export interface IDataListProps {
@@ -29,8 +26,6 @@ const DataList: React.FunctionComponent<IDataListProps> = (props) => {
         let grouped: any[] = groupBy(props.Items, props.GroupByCol);
         let groupsTemp: IGroup[] = [];
         Object.keys(grouped).map((key, index) => {
-            //let sum: number = sumBy(grouped[key], props.CountCol);
-            //let startindex: number = _getItemIndex(key);
             groupsTemp.push({
                 key: key,
                 name: key,

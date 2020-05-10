@@ -9,15 +9,14 @@ import { PivotItem } from 'office-ui-fabric-react/lib/Pivot';
 import { IColumn } from 'office-ui-fabric-react/lib/DetailsList';
 import { css } from 'office-ui-fabric-react/lib/Utilities';
 import { AppInsightsProps } from '../../webparts/appInsightsDashboard/components/AppInsightsDashboard';
+import { TimeInterval, TimeSpan, Segments } from '../enumHelper';
+import { IPageViewDetailProps, IPageViewCountProps } from '../CommonProps';
 import SectionTitle from '../components/SectionTitle';
 import CustomPivot from '../components/CustomPivot';
 import DataList from '../components/DataList';
 import Helper from '../Helper';
-import { TimeInterval, TimeSpan, Segments } from '../enumHelper';
-import { IPageViewDetailProps, IPageViewCountProps } from '../CommonProps';
 
 const map: any = require('lodash/map');
-const orderBy: any = require('lodash/orderBy');
 
 export interface IPageViewsProps {
     helper: Helper;
@@ -63,7 +62,7 @@ const PageViews: React.FunctionComponent<IPageViewsProps> = (props) => {
                 labels: map(response, 'date'),
                 datasets: [
                     {
-                        label: 'Total Page Views:',
+                        label: 'Total Page Views',
                         fill: true,
                         lineTension: 0,
                         data: map(response, 'sum'),
@@ -121,9 +120,6 @@ const PageViews: React.FunctionComponent<IPageViewsProps> = (props) => {
         cols.push({
             key: 'end', name: 'End Date', fieldName: 'end', minWidth: 100, maxWidth: 150
         });
-        // cols.push({
-        //     key: 'date', name: 'Date Interval', fieldName: 'date', minWidth: 150, maxWidth: 250
-        // });
         cols.push({
             key: 'count', name: '#PageViews', fieldName: 'count', minWidth: 100, maxWidth: 150
         });

@@ -6,6 +6,7 @@ import { DisplayMode } from '@microsoft/sp-core-library';
 import { HttpClient } from '@microsoft/sp-http';
 import PageViews from '../../../common/components/PageViews';
 import UserStatistics from '../../../common/components/UserStatistics';
+import PerformanceStatistics from '../../../common/components/PerformanceStatistics';
 import Helper from '../../../common/Helper';
 
 export interface IAppInsightsDashboardProps {
@@ -21,7 +22,7 @@ export const AppInsightsProps = React.createContext<IAppInsightsDashboardProps>(
 const AppInsightsDashboard: React.FunctionComponent<IAppInsightsDashboardProps> = (props) => {
 
 	const [helper, setHelper] = React.useState<any>(null);
-	
+
 	React.useEffect(() => {
 		setHelper(new Helper(props.AppId, props.AppKey, props.httpClient));
 	}, [props.AppId, props.AppKey]);
@@ -46,6 +47,9 @@ const AppInsightsDashboard: React.FunctionComponent<IAppInsightsDashboardProps> 
 								<div className={styles.row}>
 									<UserStatistics helper={helper} />
 								</div>
+								<div className={styles.row}>
+									<PerformanceStatistics helper={helper} />
+								</div>
 							</>
 						)}
 				</div>
@@ -55,17 +59,3 @@ const AppInsightsDashboard: React.FunctionComponent<IAppInsightsDashboardProps> 
 };
 
 export default AppInsightsDashboard;
-
-// export default class AppInsightsDashboard extends React.Component<IAppInsightsDashboardProps, {}> {
-//   public render(): React.ReactElement<IAppInsightsDashboardProps> {
-//     return (
-//       <div className={ styles.appInsightsDashboard }>
-//         <div className={ styles.container }>
-//           <div className={ styles.row }>
-
-//           </div>
-//         </div>
-//       </div>
-//     );
-//   }
-// }

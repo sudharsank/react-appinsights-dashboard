@@ -66,13 +66,46 @@ export default class Helper {
         return finalRes;
     }
 
-    public getResponseByQuery = async (query: string, timespan?: TimeSpan): Promise<any[]> => {
+    public getResponseByQuery = async (query: string, useTimespan: boolean, timespan?: TimeSpan): Promise<any[]> => {
         let finalRes: any[] = [];
-        let urlQuery: string = timespan ? `timespan=${timespan}&query=${encodeURIComponent(query)}` : `query=${encodeURIComponent(query)}`;
+        let urlQuery: string = useTimespan ? `timespan=${timespan}&query=${encodeURIComponent(query)}` : `query=${encodeURIComponent(query)}`;
         let finalPostUrl: string = this._postUrl + `/query?${urlQuery}`;
         let responseJson: any = await this.getAPIResponse(finalPostUrl);
         if (responseJson.tables.length > 0) {
             finalRes = responseJson.tables[0].rows;
+        }
+        return finalRes;
+    }
+
+    public getUserPageViews = async (timespan: TimeSpan | string, timeinterval: TimeInterval, segment: Segments[]): Promise<IPageViewDetailProps[]> => {
+        let finalRes: any[] = [];
+        let finalPostUrl: string = this._postUrl + `/metrics/pageViews/count?timespan=${encodeURIComponent(timespan)}&interval=${timeinterval}&segment=${encodeURIComponent(segment.join(','))}`;
+        let response: HttpClientResponse = await this.httpClient.get(finalPostUrl, HttpClient.configurations.v1, this.httpClientOptions);
+        let responseJson: any = await response.json();
+        if (responseJson.value && responseJson.value.segments.length > 0) {
+            let mainSegments: any[] = responseJson.value.segments;
+            mainSegments.map(mainseg => {
+                if (mainseg.segments.length > 0) {
+                    let childSegments: any[] = mainseg.segments;
+                    childSegments.map(childseg => {
+                        let grandChildSegments: any[] = childseg.segments;
+                        grandChildSegments.map(grandchildseg => {
+                            if (grandchildseg['pageView/urlPath'] != '') {
+                                finalRes.push({
+                                    oriStartDate: mainseg.start,
+                                    oriEndDate: mainseg.end,
+                                    start: this.getFormattedDate(mainseg.start),
+                                    end: this.getFormattedDate(mainseg.end),
+                                    date: `${this.getFormattedDate(mainseg.start)} - ${this.getFormattedDate(mainseg.end)}`,
+                                    Url: grandchildseg['pageView/urlPath'],
+                                    count: grandchildseg['pageViews/count'].sum,
+                                    user: childseg['customDimensions/UserTitle']
+                                });
+                            }
+                        });
+                    });
+                }
+            });
         }
         return finalRes;
     }
@@ -110,5 +143,22 @@ export default class Helper {
 
     public getFormattedDate = (datetime: string, format?: string): string => {
         return moment(datetime).local().format(format ? format : defaultDateFormat);
+    }
+
+    public getQueryDateFormat = (datetime: string): string => {
+        return moment(datetime).local().format('YYYY-MM-DDT08:MM:00.000') + 'Z';
+    }
+
+    public getQueryStartDateFormat = (datetime: string): string => {
+        return moment(datetime).format('YYYY-MM-DDT00:00:00.000Z');
+    }
+
+    public getQueryEndDateFormat = (datetime: string): string => {
+        return moment(datetime).format('YYYY-MM-DDTHH:MM:00.000Z');
+    }
+
+    public getRandomColor = () => {
+        return "rgb(" + Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255) + "," +
+            Math.floor(Math.random() * 255) + ")";
     }
 }

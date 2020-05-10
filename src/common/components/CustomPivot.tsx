@@ -17,7 +17,7 @@ const CustomPivot: React.FunctionComponent<IPivotProps> = (props) => {
             {props.ShowLabel &&
                 <label className={styles.dataLabel}>{props.LabelText}</label>
             }
-            <Pivot selectedKey={props.SelectedKey} onLinkClick={props.OnMenuClick} aria-label="Basic Pivot Example" className={styles.pivotControl}>
+            <Pivot selectedKey={props.SelectedKey} onLinkClick={props.OnMenuClick} aria-label="Pivot" className={styles.pivotControl}>
                 {props.Items &&
                     props.Items.map(item => {
                         return (

@@ -14,11 +14,15 @@ declare interface IAppInsightsDashboardWebPartStrings {
 
   SecTitle_PageViews: string;
   SecTitle_UserStats: string;
+  SecTitle_PerfStats: string;
 
   Msg_NoData: string;
   Msg_NoUrl: string;
+  Msg_NoUser: string;
   Msg_LoadList: string;
   Msg_LoadChart: string;
+  Msg_InvalidDate: string;
+  Msg_NoDate: string;
 }
 
 declare module 'AppInsightsDashboardWebPartStrings' {

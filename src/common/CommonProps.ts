@@ -1,10 +1,5 @@
 export const defaultDateFormat: string = "MM/DD/YYYY";
 export const chartDateFormat: string = "MMM DD, hh:mm A";
-export interface IListColProps {
-    key: string;
-    title: string;
-    order: number;
-}
 export interface IPageViewCountProps {
     oriDate: string;
     date: string;
@@ -18,4 +13,12 @@ export interface IPageViewDetailProps {
     date: string;
     Url: string;
     count: string;
+}
+export interface IPerfDurationProps {
+    PageName: string;
+    count: number;
+    AvgDuration: number;
+    PerDur_50: number;
+    PerDur_95: number;
+    PerDur_99: number;
 }

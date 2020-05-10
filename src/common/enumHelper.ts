@@ -23,5 +23,6 @@ export enum TimeSpan {
 export enum Segments {
     "PV_URL" = "pageView/urlPath",
     "PV_Name" = "pageView/name",
-    "OP_Name" = "operation/name"
+    "OP_Name" = "operation/name",
+    "Cust_UserTitle" = "customDimensions/UserTitle"
 }

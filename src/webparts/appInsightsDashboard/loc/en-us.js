@@ -15,10 +15,14 @@ define([], function () {
 
     SecTitle_PageViews: "Page Views Statistics",
     SecTitle_UserStats: "Users Statistics",
+    SecTitle_PerfStats: "Performance Statistics",
 
     Msg_NoData: 'Sorry no data!!!',
     Msg_NoUrl: 'Sorry no "Url" captured!!!',
+    Msg_NoUser: 'Sorry, no user info!!!',
     Msg_LoadList: 'Loading list, please wait...',
-    Msg_LoadChart: 'Loading chart, please wait...'
+    Msg_LoadChart: 'Loading chart, please wait...',
+    Msg_InvalidDate: 'Please choose the correct "Date Range" for results!!!',
+    Msg_NoDate: 'Please choose the "Date Range" for results!!!'
   }
 });

@@ -85,6 +85,14 @@
         max-height: 358px !important;
     }
 }
+.chartPerf {
+    height: 400px !important;
+    max-height: 400px !important;
+    canvas {
+        height: 400px !important;
+        max-height: 400px !important;
+    }
+}
 .textWithIcon {
     display: flex;
     overflow: hidden;
